@@ -5,14 +5,15 @@ import math
 import tree_implement as ti
 import gamemechanics as gm
 import random
+import copy
 
 #global value declarations
 ROW = 6
 COLUMN = 7
 SQUARE_SIZE = 100
 TOKEN_RADIUS = int(SQUARE_SIZE/2 - 5)
-MUTATION_RATE = 0.3
-GENERATIONS = 100
+MUTATION_RATE = 0.2
+GENERATIONS = 2
 ORIENTATION_LIST = ['HORIZONTAL', 'VERTICAL', 'DIAGONAL', 'INV_DIAGONAL']
 
 #Define colors in RGB
@@ -74,7 +75,7 @@ class TreeNode:
             if decision:
                 if open_row == self.possible_row_move:
                     self.node_val = self.node_val + self.left + self.left
-                self.node_val = self.node_val + self.right
+                self.node_val = self.node_val + self.left
             else:
                 self.node_val = self.node_val + self.right + self.right
             print("Deciding Node values here")
@@ -104,7 +105,7 @@ class TreeNode:
         return self.possible_row_move, self.possible_col_move
     
     def mutate(self):
-        mutated_self = self
+        mutated_self = copy.deepcopy(self)
         TreeNode.PrintTree(self)
         orientation_for_mutation = None
         row_start_point_for_mutation = None
@@ -117,8 +118,9 @@ class TreeNode:
             row_start_point_for_mutation = random.randint(0,(ROW-1))
             col_start_point_for_mutation = random.randint(0,(COLUMN-1))
             is_valid_result = gm.find_if_valid_row_col_for_mutation(row_start_point_for_mutation, col_start_point_for_mutation, self.offset_val, orientation_for_mutation)
+            print('result of valid Mutated row/col: ' + str(is_valid_result))
 
-        if mutation_probability < MUTATION_RATE:
+        if mutation_probability > MUTATION_RATE:
             mutated_self.row_move_start_point = col_start_point_for_mutation
             mutated_self.col_move_start_point = row_start_point_for_mutation
             mutated_self.orientation = orientation_for_mutation
@@ -137,8 +139,8 @@ def find_best_move_after_evolution(population1, population2):
     return best_move
 
 def co_evolve(tree_set):
-    population1 = tree_set
-    population2 = tree_set
+    population1 = copy.deepcopy(tree_set)
+    population2 = copy.deepcopy(tree_set)
     mutated_population1 = []
     mutated_population2 = []
     population_size = len(tree_set)
@@ -150,8 +152,10 @@ def co_evolve(tree_set):
         print("Population 2:")
         print(population2)
         for i in range(population_size):
+            TreeNode.PrintTree(population1[i])
+            TreeNode.decide_node_values(population1[i])
             for j in range(population_size):
-                TreeNode.decide_node_values(population1[i])
+                TreeNode.PrintTree(population2[j])
                 TreeNode.decide_node_values(population2[j])
                 if population1[i].node_val >= population2[j].node_val:
                     TreeNode.add_win(population1[i])

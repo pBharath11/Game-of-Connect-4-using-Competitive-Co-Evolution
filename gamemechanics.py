@@ -3,6 +3,7 @@ import pygame
 import sys
 import math
 import random
+import copy
 
 
 #global value declarations
@@ -224,24 +225,40 @@ def find_if_best_move(game_board, token, row, col, offset, orientation, possible
     game_board_copy = game_board
     game_board_copy[possible_row_move][possible_col_move] = token
     token_count = 0
-    if orientation == 'HORIZONTAL':
-        for col_len in range(offset):
-            if game_board_copy[row][col+col_len] == token:
-                token_count += 1
-    elif orientation == 'VERTICAL':
-        for row_len in range(offset):
-            if game_board_copy[row+row_len][col] == token:
-                token_count += 1
-    elif orientation == 'DIAGONAL':
-        for len in range(offset):
-            if game_board_copy[row+len][col+len] == token:
-                token_count += 1
-    elif orientation == 'INV_DIAGONAL':
-        for len in range(offset):
-            if game_board_copy[row-len][col+len] == token:
-                token_count += 1
-    if token_count == offset:
-        return True
+    result = find_if_valid_row_col_for_mutation(row, col, offset, orientation)
+    if result:
+        if orientation == 'HORIZONTAL':
+            for col_len in range(offset):
+                print('Inside for loop horizontal for find_if_best_move')
+                print('Checking Row: ' + str(row) + ' col: ' + str(col+col_len))
+                print('value is: ' + str(game_board[row][col+col_len]) )
+                if game_board_copy[row][col+col_len] == token:
+                    token_count += 1
+        elif orientation == 'VERTICAL':
+            for row_len in range(offset):
+                print('Inside for loop vertical for find_if_best_move')
+                print('Checking Row: ' + str(row+row_len) + ' col: ' + str(col))
+                print('value is: ' + str(game_board[row+row_len][col]) )
+                if game_board_copy[row+row_len][col] == token:
+                    token_count += 1
+        elif orientation == 'DIAGONAL':
+            for len in range(offset):
+                print('Inside for loop diagonal for find_if_best_move')
+                print('Checking Row: ' + str(row+len) + ' col: ' + str(col+len))
+                print('value is: ' + str(game_board[row+len][col+len]) )
+                if game_board_copy[row+len][col+len] == token:
+                    token_count += 1
+        elif orientation == 'INV_DIAGONAL':
+            for len in range(offset):
+                print('Inside for loop inverse_Diagonal for find_if_best_move')
+                print('Checking Row: ' + str(row-len) + ' col: ' + str(col+len))
+                print('value is: ' + str(game_board[row-len][col+len]) )
+                if game_board_copy[row-len][col+len] == token:
+                    token_count += 1
+        if token_count == offset:
+            return True
+        else:
+            return False
     else:
         return False
 
