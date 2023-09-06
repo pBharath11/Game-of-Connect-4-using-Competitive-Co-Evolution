@@ -62,259 +62,185 @@ def is_winning_move(game_board, token):
         for row in range(3, ROW):
             if game_board[row][col] == token and game_board[row-1][col+1] == token and game_board[row-2][col+2] == token and game_board[row-3][col+3] == token:
                 return True
-"""
+"""       
 
+def check_possible_moves(game_board, token, OFFSET):
 
-
-
-#check for a valid 4th token move and return a boolean value accordingly
-def check_winning_move(game_board, token):
-
-    OFFSET = 4
+    possible_token_slots = []
     #checking horizontally
-    for col in range(COLUMN-3):
+    for col in range(COLUMN-(OFFSET-1)):
         for row in range(ROW):
-            consecutive_tokens = 0
+
             empty_tokens = 0
             value_tokens = 0
             for offset in range(OFFSET): 
                 if game_board[row][col+offset] == token:
-                    consecutive_tokens += 1
                     value_tokens += 1
                 elif game_board[row][col+offset] == 0:
-                    consecutive_tokens += 1
                     empty_tokens += 1
-            if empty_tokens == 1:
+            if (value_tokens == OFFSET-1 and empty_tokens == 1):
+                print('row: '+ str(row))
+                print('col: '+ str(col))
+                print('empty: '+ str(empty_tokens))
+                print('value: '+ str(value_tokens))
                 orientation = 'HORIZONTAL'
-                return row, col, OFFSET, orientation
+                possible_token_slots.append((row, col, OFFSET, orientation))
             
     #checking vertically      
     for col in range(COLUMN):
-        for row in range(ROW-3):
-            consecutive_tokens = 0
+        for row in range(ROW-(OFFSET-1)):
+
             empty_tokens = 0
             value_tokens = 0
             for offset in range(OFFSET): 
                 if game_board[row+offset][col] == token:
-                    consecutive_tokens += 1
                     value_tokens += 1
                 elif game_board[row+offset][col] == 0:
-                    consecutive_tokens += 1
                     empty_tokens += 1
-            if empty_tokens == 1:
+            if (value_tokens == OFFSET-1 and empty_tokens == 1):
+                print('row: '+ str(row))
+                print('col: '+ str(col))
+                print('empty: '+ str(empty_tokens))
+                print('value: '+ str(value_tokens))
                 orientation = 'VERTICAL'
-                return row, col, OFFSET, orientation
+                possible_token_slots.append((row, col, OFFSET, orientation))
             
     #checking for +ve diagonal       
-    for col in range(COLUMN-3):
-        for row in range(ROW-3):
-            consecutive_tokens = 0
+    for col in range(COLUMN-(OFFSET-1)):
+        for row in range(ROW-(OFFSET-1)):
             empty_tokens = 0
             value_tokens = 0
             for offset in range(OFFSET): 
                 if game_board[row+offset][col+offset] == token:
-                    consecutive_tokens += 1
                     value_tokens += 1
                 elif game_board[row+offset][col+offset] == 0:
-                    consecutive_tokens += 1
                     empty_tokens += 1
-            if empty_tokens == 1:
+            if (value_tokens == OFFSET-1 and empty_tokens == 1):
+                print('row: '+ str(row))
+                print('col: '+ str(col))
+                print('empty: '+ str(empty_tokens))
+                print('value: '+ str(value_tokens))
                 orientation = 'DIAGONAL'
-                return row, col, OFFSET, orientation
+                possible_token_slots.append((row, col, OFFSET, orientation))
     
     #checking for -ve diagonal
-    for col in range(COLUMN-3):
-        for row in range(3, ROW):
-            consecutive_tokens = 0
+    for col in range(COLUMN-(OFFSET-1)):
+        for row in range((OFFSET-1), ROW):
             empty_tokens = 0
             value_tokens = 0
             for offset in range(OFFSET): 
                 if game_board[row-offset][col+offset] == token:
-                    consecutive_tokens += 1
                     value_tokens += 1
                 elif game_board[row-offset][col+offset] == 0:
-                    consecutive_tokens += 1
                     empty_tokens += 1
-            if empty_tokens == 1:
+            if (value_tokens == OFFSET-1 and empty_tokens == 1):
+                print('row: '+ str(row))
+                print('col: '+ str(col))
+                print('empty: '+ str(empty_tokens))
+                print('value: '+ str(value_tokens))
                 orientation = 'INV_DIAGONAL'
-                return row, col, OFFSET, orientation
+                possible_token_slots.append((row, col, OFFSET, orientation))
+    return possible_token_slots
 
 
-#check for a 3rd token move and return a boolean value accordingly
-def check_third_token_move(game_board, token):
-
-    OFFSET = 3
-    #checking horizontally
-    for col in range(COLUMN-2):
-        for row in range(ROW):
-            consecutive_tokens = 0
-            empty_tokens = 0
-            value_tokens = 0
-            for offset in range(OFFSET): 
-                if game_board[row][col+offset] == token:
-                    consecutive_tokens += 1
-                    value_tokens += 1
-                elif game_board[row][col+offset] == 0:
-                    consecutive_tokens += 1
-                    empty_tokens += 1
-            if empty_tokens == 1:
-                orientation = 'HORIZONTAL'
-                return row, col, OFFSET, orientation
-            
-    #checking vertically      
-    for col in range(COLUMN):
-        for row in range(ROW-2):
-            consecutive_tokens = 0
-            empty_tokens = 0
-            value_tokens = 0
-            for offset in range(OFFSET): 
-                if game_board[row+offset][col] == token:
-                    consecutive_tokens += 1
-                    value_tokens += 1
-                elif game_board[row+offset][col] == 0:
-                    consecutive_tokens += 1
-                    empty_tokens += 1
-            if empty_tokens == 1:
-                orientation = 'VERTICAL'
-                return row, col, OFFSET, orientation
-            
-    #checking for +ve diagonal       
-    for col in range(COLUMN-2):
-        for row in range(ROW-2):
-            consecutive_tokens = 0
-            empty_tokens = 0
-            value_tokens = 0
-            for offset in range(OFFSET): 
-                if game_board[row+offset][col+offset] == token:
-                    consecutive_tokens += 1
-                    value_tokens += 1
-                elif game_board[row+offset][col+offset] == 0:
-                    consecutive_tokens += 1
-                    empty_tokens += 1
-            if empty_tokens == 1:
-                orientation = 'DIAGONAL'
-                return row, col, OFFSET, orientation
-    
-    #checking for -ve diagonal
-    for col in range(COLUMN-2):
-        for row in range(2, ROW):
-            consecutive_tokens = 0
-            empty_tokens = 0
-            value_tokens = 0
-            for offset in range(OFFSET): 
-                if game_board[row-offset][col+offset] == token:
-                    consecutive_tokens += 1
-                    value_tokens += 1
-                elif game_board[row-offset][col+offset] == 0:
-                    consecutive_tokens += 1
-                    empty_tokens += 1
-            if empty_tokens == 1:
-                orientation = 'INV_DIAGONAL'
-                return row, col, OFFSET, orientation
-
-
-#check for a 3rd token move and return a boolean value accordingly
-def check_second_token_move(game_board, token):
-
-    OFFSET = 2
-    #checking horizontally
-    for col in range(COLUMN-1):
-        for row in range(ROW):
-            consecutive_tokens = 0
-            empty_tokens = 0
-            value_tokens = 0
-            for offset in range(OFFSET): 
-                if game_board[row][col+offset] == token:
-                    consecutive_tokens += 1
-                    value_tokens += 1
-                elif game_board[row][col+offset] == 0:
-                    consecutive_tokens += 1
-                    empty_tokens += 1
-            if empty_tokens == 1:
-                orientation = 'HORIZONTAL'
-                return row, col, OFFSET, orientation
-            
-    #checking vertically      
-    for col in range(COLUMN):
-        for row in range(ROW-1):
-            consecutive_tokens = 0
-            empty_tokens = 0
-            value_tokens = 0
-            for offset in range(OFFSET): 
-                if game_board[row+offset][col] == token:
-                    consecutive_tokens += 1
-                    value_tokens += 1
-                elif game_board[row+offset][col] == 0:
-                    consecutive_tokens += 1
-                    empty_tokens += 1
-            if empty_tokens == 1:
-                orientation = 'VERTICAL'
-                return row, col, OFFSET, orientation
-            
-    #checking for +ve diagonal       
-    for col in range(COLUMN-1):
-        for row in range(ROW-1):
-            consecutive_tokens = 0
-            empty_tokens = 0
-            value_tokens = 0
-            for offset in range(OFFSET): 
-                if game_board[row+offset][col+offset] == token:
-                    consecutive_tokens += 1
-                    value_tokens += 1
-                elif game_board[row+offset][col+offset] == 0:
-                    consecutive_tokens += 1
-                    empty_tokens += 1
-            if empty_tokens == 1:
-                orientation = 'DIAGONAL'
-                return row, col, OFFSET, orientation
-    
-    #checking for -ve diagonal
-    for col in range(COLUMN-1):
-        for row in range(1, ROW):
-            consecutive_tokens = 0
-            empty_tokens = 0
-            value_tokens = 0
-            for offset in range(OFFSET): 
-                if game_board[row-offset][col+offset] == token:
-                    consecutive_tokens += 1
-                    value_tokens += 1
-                elif game_board[row-offset][col+offset] == 0:
-                    consecutive_tokens += 1
-                    empty_tokens += 1
-            if empty_tokens == 1:
-                orientation = 'INV_DIAGONAL'
-                return row, col, OFFSET, orientation
-            
-def find_empty_slot(game_board, row, col, offset, orientation):
+def find_empty_slot(game_board, possible_move_set):
+    print('finding empty slot for set:')
+    print(possible_move_set)
+    print(type(possible_move_set))
+    row = possible_move_set[0]
+    col = possible_move_set[1]
+    offset = possible_move_set[2]
+    orientation = possible_move_set[3]
+    row_val = None
+    col_val = None
+    print('Inside empty slot functiobn')
     if orientation == 'HORIZONTAL':
         for col_len in range(offset):
+            print('Inside for loop horizontal')
+            print('Checking Row: ' + str(row) + ' col: ' + str(col+col_len))
+            print('value is: ' + str(game_board[row][col+col_len]) )
             if game_board[row][col+col_len] == 0:
-                return row, col+col_len
+                print('Horizontal fn' + str(row), str(col+col_len))
+                row_val = row
+                col_val = col+col_len
     elif orientation == 'VERTICAL':
         for row_len in range(offset):
+            print('Inside for loop Vertical')
+            print('Checking Row: ' + str(row+row_len) + ' col: ' + str(col))
+            print('value is: ' + str(game_board[row+row_len][col]) )
             if game_board[row+row_len][col] == 0:
-                return row+row_len, col
+                print('Vertical fn' + str(row+row_len), str(col))
+                row_val = row+row_len
+                col_val = col
     elif orientation == 'DIAGONAL':
-        for col_len in range(offset):
-            for row_len in range(offset):
-                if game_board[row+row_len][col+col_len] == 0:
-                    return row+row_len, col+col_len
+        for len in range(offset):
+            print('Inside for loop Diagonal')
+            print('Checking Row: ' + str(row+len) + ' col: ' + str(col+len))
+            print('value is: ' + str(game_board[row+len][col+len]) )
+            if game_board[row+len][col+len] == 0:
+                print('Diagonal fn' + str(row+len), str(col+len))
+                row_val = row+len
+                col_val = col+len
     elif orientation == 'INV_DIAGONAL':
-        for col_len in range(offset):
-            for row_len in range(offset):
-                if game_board[row-row_len][col+col_len] == 0:
-                    return row-row_len, col+col_len
-
-def check_winning_recursive(game_board, token, col_choice = None):
-    if col_choice is not None:
-        response = (0,col_choice ,1,"VERTICAL")
+        for len in range(offset):
+            print('Inside for loop inverse Diagonal')
+            print('Checking Row: ' + str(row-len) + ' col: ' + str(col+len))
+            print('value is: ' + str(game_board[row-len][col+len]) )
+            if game_board[row-len][col+len] == 0:
+                print('Inverse Diagonal fn' + str(row-len), str(col+len))
+                row_val = row-len
+                col_val = col+len
     else:
-        response = check_winning_move(game_board, token)
-        if response is None:
-            response = check_third_token_move(game_board, token)
-            if response is None:
-                response = check_second_token_move(game_board, token)
-        print('x =' + response)
+        print("Find Empty Slot! Invalid Orientation")
+        sys.exit(1)
+    return row_val, col_val      
 
+def check_winning_recursive(game_board, token, first_time = False):
+    # TODO: Generate col_choice (response[1])
+    response = []
+    if first_time:
+        discard_num = random.randint(0,6)
+        while game_board[0][discard_num] == 2:
+            discard_num = random.randint(0,6)
+        response = (0, discard_num, 1, 'VERTICAL')
+        print('TEST first time=' + str(response))
+        return response
+    
+    if len(response) == 0:
+        response.append(check_possible_moves(game_board, token, 4))
+        #print('4 token moves =')
+        #print(response)
+        response.append(check_possible_moves(game_board, token, 3))
+        #print('3 token moves =')
+        #print(response)
+        response.append(check_possible_moves(game_board, token, 2))
+        #print('2 token moves =')
+        #print(response)
+        response = [ x for i in response for x in i]
     return response
-                    
+
+
+def find_if_best_move(game_board, token, row, col, offset, orientation, possible_row_move, possible_col_move):
+    game_board_copy = game_board
+    game_board_copy[possible_row_move][possible_col_move] = token
+    token_count = 0
+    if orientation == 'HORIZONTAL':
+        for col_len in range(offset):
+            if game_board_copy[row][col+col_len] == token:
+                token_count += 1
+    elif orientation == 'VERTICAL':
+        for row_len in range(offset):
+            if game_board_copy[row+row_len][col] == token:
+                token_count += 1
+    elif orientation == 'DIAGONAL':
+        for len in range(offset):
+            if game_board_copy[row+len][col+len] == token:
+                token_count += 1
+    elif orientation == 'INV_DIAGONAL':
+        for len in range(offset):
+            if game_board_copy[row-len][col+len] == token:
+                token_count += 1
+    if token_count == offset:
+        return True
+    else:
+        return False
