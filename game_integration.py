@@ -110,13 +110,14 @@ class TreeNode:
         row_start_point_for_mutation = None
         col_start_point_for_mutation = None
         is_valid_result = False
-        while is_valid_result:
-            mutation_probability = random.random()
-            print("Mutation probability:" + str(mutation_probability))
+        mutation_probability = random.random()
+        print("Mutation probability:" + str(mutation_probability))
+        while is_valid_result is False:
             orientation_for_mutation = random.choice(ORIENTATION_LIST)
             row_start_point_for_mutation = random.randint(0,(ROW-1))
             col_start_point_for_mutation = random.randint(0,(COLUMN-1))
-        
+            is_valid_result = gm.find_if_valid_row_col_for_mutation(row_start_point_for_mutation, col_start_point_for_mutation, self.offset_val, orientation_for_mutation)
+
         if mutation_probability < MUTATION_RATE:
             mutated_self.row_move_start_point = col_start_point_for_mutation
             mutated_self.col_move_start_point = row_start_point_for_mutation

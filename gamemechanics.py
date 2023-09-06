@@ -244,3 +244,25 @@ def find_if_best_move(game_board, token, row, col, offset, orientation, possible
         return True
     else:
         return False
+
+
+def find_if_valid_row_col_for_mutation(row, col, offset, orientation):
+
+    if orientation == 'HORIZONTAL':
+        new_row = row
+        new_col = col+offset
+    elif orientation == 'VERTICAL':
+        new_row = row+offset
+        new_col = col
+    elif orientation == 'DIAGONAL':
+        new_row = row+offset
+        new_col = col+offset
+    elif orientation == 'INV_DIAGONAL':
+        new_row = row-offset
+        new_col = col+offset
+    
+    print(new_row,new_col)
+    if (0 <= new_row < ROW) and (0 <= new_col < COLUMN):
+        return True
+    else:
+        return False
