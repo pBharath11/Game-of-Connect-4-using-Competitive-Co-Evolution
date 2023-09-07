@@ -29,34 +29,7 @@ def check_isValid_Location(game_board, col_choice):
 def get_next_open_row(game_board, col_choice):
     for r in range(ROW):
         if game_board[r][col_choice] == 0:
-            return r
-"""
-#check if the current move made by the player is a winning move or not and return a boolean value accordingly
-def is_winning_move(game_board, token):
-    #checking horizontally for winning move
-    for col in range(COLUMN-3):
-        for row in range(ROW):
-            if game_board[row][col] == token and game_board[row][col+1] == token and game_board[row][col+2] == token and game_board[row][col+3] == token:
-                return True
-
-    #checking vertically for winning move
-    for col in range(COLUMN):
-        for row in range(ROW-3):
-            if game_board[row][col] == token and game_board[row+1][col] == token and game_board[row+2][col] == token and game_board[row+3][col] == token:
-                return True
-            
-    #checking for +ve diagonal
-    for col in range(COLUMN-3):
-        for row in range(ROW-3):
-            if game_board[row][col] == token and game_board[row+1][col+1] == token and game_board[row+2][col+2] == token and game_board[row+3][col+3] == token:
-                return True
-    
-    #checking for -ve diagonal
-    for col in range(COLUMN-3):
-        for row in range(3, ROW):
-            if game_board[row][col] == token and game_board[row-1][col+1] == token and game_board[row-2][col+2] == token and game_board[row-3][col+3] == token:
-                return True
-"""       
+            return r    
 
 def check_possible_moves(game_board, token, OFFSET):
 

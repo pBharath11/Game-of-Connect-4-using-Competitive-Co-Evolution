@@ -16,7 +16,7 @@ MUTATION_RATE = 0.2
 GENERATIONS = 3
 ORIENTATION_LIST = ['HORIZONTAL', 'VERTICAL', 'DIAGONAL', 'INV_DIAGONAL']
 BAD_MOVE = -999
-GOOD_MOVE = 99
+GOOD_MOVE = 25
 GREAT_MOVE = 999
 
 #Define colors in RGB
@@ -58,7 +58,7 @@ class TreeNode:
             self.right = -4
 
     def decide_node_values(self):
-        TreeNode.find_child_node_value_payoff(self)
+        self.find_child_node_value_payoff()
         if self.node_val is None:
             self.left = 1
             self.right = -1
@@ -100,8 +100,12 @@ class TreeNode:
         print(self.possible_row_move)
         print(self.possible_col_move)
         print(self.right)
+    
+    def print_node_val(self):
+        print(self.node_val)
 
     def fetch_node_value(self):
+        #print(self.node_val)
         return self.node_val
     
     def fetch_move_row_col_value(self):
@@ -109,7 +113,7 @@ class TreeNode:
     
     def mutate(self):
         mutated_self = copy.deepcopy(self)
-        TreeNode.PrintTree(self)
+        self.PrintTree()
         orientation_for_mutation = None
         row_start_point_for_mutation = None
         col_start_point_for_mutation = None
@@ -131,14 +135,14 @@ class TreeNode:
 
 def find_best_move_after_evolution(population1, population2):
 
-    sorted_pop1 = sorted(population1, key= TreeNode.fetch_node_value, reverse=True)
-    sorted_pop2 = sorted(population2, key= TreeNode.fetch_node_value, reverse=True)
-    pop1_best_move_node_val = TreeNode.fetch_node_value(sorted_pop1[0])
-    pop2_best_move_node_val = TreeNode.fetch_node_value(sorted_pop2[0])
+    sorted_pop1 = sorted(population1, key= lambda x:x.fetch_node_value(), reverse=True)
+    sorted_pop2 = sorted(population2, key= lambda x:x.fetch_node_value(), reverse=True)
+    pop1_best_move_node_val = sorted_pop1[0].fetch_node_value()
+    pop2_best_move_node_val = sorted_pop2[0].fetch_node_value()
     if pop1_best_move_node_val > pop2_best_move_node_val:
-        best_move = TreeNode.fetch_move_row_col_value(sorted_pop1[0])
+        best_move = sorted_pop1[0].fetch_move_row_col_value()
     else:
-        best_move = TreeNode.fetch_move_row_col_value(sorted_pop2[0])
+        best_move = sorted_pop2[0].fetch_move_row_col_value()
     return best_move
 
 def co_evolve(tree_set):
@@ -155,18 +159,29 @@ def co_evolve(tree_set):
         print("Population 2:")
         print(population2)
         for i in range(population_size):
-            TreeNode.PrintTree(population1[i])
-            TreeNode.decide_node_values(population1[i])
+            population1[i].PrintTree()
+            population1[i].decide_node_values()
             for j in range(population_size):
-                TreeNode.PrintTree(population2[j])
-                TreeNode.decide_node_values(population2[j])
+                population2[j].PrintTree()
+                population2[j].decide_node_values()
                 if population1[i].node_val >= population2[j].node_val:
-                    TreeNode.add_win(population1[i])
+                    population1[i].add_win()
                 else:
-                    TreeNode.add_win(population2[j])
-        
-        fitness_ranked_population1 = sorted(population1, key= TreeNode.fetch_node_value, reverse=True)
-        fitness_ranked_population2 = sorted(population2, key= TreeNode.fetch_node_value, reverse=True)
+                    population2[j].add_win()
+        print("Population 1 Node Values before sorting:")
+        for i in range(population_size):
+            population1[i].print_node_val()
+        fitness_ranked_population1 = sorted(population1, key= lambda x:x.fetch_node_value(), reverse=True)
+        print("Population 1 Node Values after sorting:")
+        for i in range(population_size):
+            fitness_ranked_population1[i].print_node_val()
+        print("Population 2 Node Values before sorting:")
+        for i in range(population_size):
+            population2[i].print_node_val()
+        fitness_ranked_population2 = sorted(population2, key= lambda x:x.fetch_node_value(), reverse=True)
+        print("Population 2 Node Values after sorting:")
+        for i in range(population_size):
+            fitness_ranked_population2[i].print_node_val()
 
         for length in range(int(population_size/2)):
             mutated_population1.append(fitness_ranked_population1[length])
@@ -178,8 +193,8 @@ def co_evolve(tree_set):
         print(fitness_ranked_population2)
         for i in range(len(fitness_ranked_population1)):
             print("Inside Mutation loop")
-            mutated_population1.append(TreeNode.mutate(fitness_ranked_population1[i]))
-            mutated_population2.append(TreeNode.mutate(fitness_ranked_population2[i]))
+            mutated_population1.append(fitness_ranked_population1[i].mutate())
+            mutated_population2.append(fitness_ranked_population2[i].mutate())
 
         population1 = mutated_population1
         population2 = mutated_population2
@@ -335,7 +350,7 @@ while not game_over:
                             generated_tree_set.append(TreeNode(game_board, 1, possible_token_slot_sets[i],possible_token_slot_locations[i] ))
                             #print("counter value:" + str(GLOBAL_CNTR))
                             #GLOBAL_CNTR += 1
-                            TreeNode.decide_node_values(generated_tree_set[i])
+                            generated_tree_set[i].decide_node_values()
                     best_possible_move = co_evolve(generated_tree_set)
 
                     print("Best Possible Move is:")
@@ -345,7 +360,7 @@ while not game_over:
                     print(possible_token_slot_locations)
                     """print('Trees generated for all possible moves:')
                     for cntr in range(len(generated_tree_set)):
-                        TreeNode.PrintTree(generated_tree_set[cntr])
+                        generated_tree_set[cntr].PrintTree()
                     temp_row = None
                     temp_col = None
                     for i in range(1):
