@@ -15,6 +15,9 @@ TOKEN_RADIUS = int(SQUARE_SIZE/2 - 5)
 MUTATION_RATE = 0.2
 GENERATIONS = 3
 ORIENTATION_LIST = ['HORIZONTAL', 'VERTICAL', 'DIAGONAL', 'INV_DIAGONAL']
+BAD_MOVE = -999
+GOOD_MOVE = 99
+GREAT_MOVE = 999
 
 #Define colors in RGB
 BOARD_BACKGROUND = (222,225,230)
@@ -66,7 +69,7 @@ class TreeNode:
             elif (self.offset_val-1) == 3:
                 self.node_val = 50
             elif (self.offset_val - 1) == 4:
-                self.node_val = 100
+                self.node_val = 90
             print("Decision is None")
         else:
             decision = gm.find_if_best_move(self.board_status, self.token, self.row_move_start_point, self.col_move_start_point, self.offset_val, self.orientation, self.possible_row_move, self.possible_col_move)
@@ -74,10 +77,10 @@ class TreeNode:
             open_row = get_next_open_row(self.board_status, self.possible_col_move)
             if decision:
                 if open_row == self.possible_row_move:
-                    self.node_val = self.node_val + self.left + self.left
-                self.node_val = self.node_val + self.left
+                    self.node_val = self.node_val + self.left + self.left + GREAT_MOVE
+                self.node_val = self.node_val + self.left + GOOD_MOVE
             else:
-                self.node_val = self.node_val + self.right + self.right
+                self.node_val = self.node_val + self.right + self.right + BAD_MOVE
             print("Deciding Node values here")
 
     def add_win(self):
@@ -340,10 +343,10 @@ while not game_over:
                     drop_token(game_board, best_possible_move[0], best_possible_move[1], 1)
                     print(possible_token_slot_sets)
                     print(possible_token_slot_locations)
-                    print('Trees generated for all possible moves:')
+                    """print('Trees generated for all possible moves:')
                     for cntr in range(len(generated_tree_set)):
                         TreeNode.PrintTree(generated_tree_set[cntr])
-                    """temp_row = None
+                    temp_row = None
                     temp_col = None
                     for i in range(1):
                         temp_var = possible_token_slot_locations[i]

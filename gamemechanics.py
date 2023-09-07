@@ -12,13 +12,6 @@ COLUMN = 7
 SQUARE_SIZE = 100
 TOKEN_RADIUS = int(SQUARE_SIZE/2 - 5)
 
-#Define colors in RGB
-BOARD_BACKGROUND = (222,225,230)
-TOKEN_BACKGROUND = (14,15,16)
-PLAYER_ONE = (24,187,156)
-PLAYER_TWO = (241,111,247)
-TOKEN_HOVER_BACKGROUND = (0, 0, 0)
-
 #defines a gameboard layout
 def create_gameboard():
     board = np.zeros((ROW,COLUMN))
