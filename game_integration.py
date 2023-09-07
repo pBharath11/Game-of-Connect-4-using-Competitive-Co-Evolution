@@ -273,6 +273,7 @@ game_board = create_gameboard()
 print(game_board)
 game_over = False
 turn = 0
+best_possible_moves_for_game = []
 
 #GUI initialisation
 pygame.init()
@@ -352,6 +353,7 @@ while not game_over:
                             #GLOBAL_CNTR += 1
                             generated_tree_set[i].decide_node_values()
                     best_possible_move = co_evolve(generated_tree_set)
+                    best_possible_moves_for_game.append(best_possible_move)
 
                     print("Best Possible Move is:")
                     print(best_possible_move)
@@ -402,4 +404,6 @@ while not game_over:
 
             #wait function after the game ends
             if game_over:
+                print('Best possible Moves generated over the course of the game:')
+                print(best_possible_moves_for_game)
                 pygame.time.wait(10000)
