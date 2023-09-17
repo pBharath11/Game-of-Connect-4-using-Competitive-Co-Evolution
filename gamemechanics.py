@@ -5,12 +5,17 @@ import math
 import random
 import copy
 
-
 #global value declarations
 ROW = 6
 COLUMN = 7
 SQUARE_SIZE = 100
 TOKEN_RADIUS = int(SQUARE_SIZE/2 - 5)
+#Define colors in RGB
+BOARD_BACKGROUND = (222,225,230)
+TOKEN_BACKGROUND = (14,15,16)
+PLAYER_ONE = (255,0,0)
+PLAYER_TWO = (255,255,0)
+TOKEN_HOVER_BACKGROUND = (0, 0, 0)
 
 #defines a gameboard layout
 def create_gameboard():
@@ -30,6 +35,38 @@ def get_next_open_row(game_board, col_choice):
     for r in range(ROW):
         if game_board[r][col_choice] == 0:
             return r    
+
+#check if the current move made by the player is a winning move or not and return a boolean value accordingly
+def is_winning_move(game_board, token):
+    #checking horizontally for winning move
+    for col in range(COLUMN-3):
+        for row in range(ROW):
+            if game_board[row][col] == token and game_board[row][col+1] == token and game_board[row][col+2] == token and game_board[row][col+3] == token:
+                return True
+
+    #checking vertically for winning move
+    for col in range(COLUMN):
+        for row in range(ROW-3):
+            if game_board[row][col] == token and game_board[row+1][col] == token and game_board[row+2][col] == token and game_board[row+3][col] == token:
+                return True
+            
+    #checking for +ve diagonal
+    for col in range(COLUMN-3):
+        for row in range(ROW-3):
+            if game_board[row][col] == token and game_board[row+1][col+1] == token and game_board[row+2][col+2] == token and game_board[row+3][col+3] == token:
+                return True
+    
+    #checking for -ve diagonal
+    for col in range(COLUMN-3):
+        for row in range(3, ROW):
+            if game_board[row][col] == token and game_board[row-1][col+1] == token and game_board[row-2][col+2] == token and game_board[row-3][col+3] == token:
+                return True
+
+#prints the game board in the terminal
+def print_board(game_board):
+    print(np.flip(game_board,0))
+
+
 
 def check_possible_moves(game_board, token, OFFSET):
 
@@ -170,7 +207,7 @@ def check_winning_recursive(game_board, token, first_time = False):
         while game_board[0][discard_num] == 2:
             discard_num = random.randint(0,6)
         response = (0, discard_num, 1, 'VERTICAL')
-        print('TEST first time=' + str(response))
+        #print('TEST first time=' + str(response))
         return response
     
     if len(response) == 0:

@@ -13,7 +13,7 @@ COLUMN = 7
 SQUARE_SIZE = 100
 TOKEN_RADIUS = int(SQUARE_SIZE/2 - 5)
 MUTATION_RATE = 0.2
-GENERATIONS = 3
+GENERATIONS = 5
 ORIENTATION_LIST = ['HORIZONTAL', 'VERTICAL', 'DIAGONAL', 'INV_DIAGONAL']
 BAD_MOVE = -999
 GOOD_MOVE = 25
@@ -22,8 +22,8 @@ GREAT_MOVE = 999
 #Define colors in RGB
 BOARD_BACKGROUND = (222,225,230)
 TOKEN_BACKGROUND = (14,15,16)
-PLAYER_ONE = (24,187,156)
-PLAYER_TWO = (241,111,247)
+PLAYER_ONE = (255,0,0)
+PLAYER_TWO = (255,255,0)
 TOKEN_HOVER_BACKGROUND = (0, 0, 0)
 
 class TreeNode:
@@ -74,7 +74,7 @@ class TreeNode:
         else:
             decision = gm.find_if_best_move(self.board_status, self.token, self.row_move_start_point, self.col_move_start_point, self.offset_val, self.orientation, self.possible_row_move, self.possible_col_move)
             print(decision)
-            open_row = get_next_open_row(self.board_status, self.possible_col_move)
+            open_row = gm.get_next_open_row(self.board_status, self.possible_col_move)
             if decision:
                 if open_row == self.possible_row_move:
                     self.node_val = self.node_val + self.left + self.left + GREAT_MOVE
@@ -203,52 +203,6 @@ def co_evolve(tree_set):
     best_move_after_co_evolution  = find_best_move_after_evolution(population1,population2)
     return best_move_after_co_evolution    
 
-
-#defines a gameboard layout
-def create_gameboard():
-    board = np.zeros((ROW,COLUMN))
-    return board
-
-#drop a token from each player onto the game board
-def drop_token(game_board, open_row, col_choice, token):
-    game_board[open_row][col_choice] = token
-
-#check if the location selected by the player is a valid location or not
-def check_isValid_Location(game_board, col_choice):
-    return game_board[ROW-1][col_choice] == 0
-
-#checks for the top most open slot in a particular selected row and returns the row if its empty for a token to be filled in
-def get_next_open_row(game_board, col_choice):
-    for r in range(ROW):
-        if game_board[r][col_choice] == 0:
-            return r
-
-#check if the current move made by the player is a winning move or not and return a boolean value accordingly
-def is_winning_move(game_board, token):
-    #checking horizontally for winning move
-    for col in range(COLUMN-3):
-        for row in range(ROW):
-            if game_board[row][col] == token and game_board[row][col+1] == token and game_board[row][col+2] == token and game_board[row][col+3] == token:
-                return True
-
-    #checking vertically for winning move
-    for col in range(COLUMN):
-        for row in range(ROW-3):
-            if game_board[row][col] == token and game_board[row+1][col] == token and game_board[row+2][col] == token and game_board[row+3][col] == token:
-                return True
-            
-    #checking for +ve diagonal
-    for col in range(COLUMN-3):
-        for row in range(ROW-3):
-            if game_board[row][col] == token and game_board[row+1][col+1] == token and game_board[row+2][col+2] == token and game_board[row+3][col+3] == token:
-                return True
-    
-    #checking for -ve diagonal
-    for col in range(COLUMN-3):
-        for row in range(3, ROW):
-            if game_board[row][col] == token and game_board[row-1][col+1] == token and game_board[row-2][col+2] == token and game_board[row-3][col+3] == token:
-                return True
-
 #draws the GUI of the gameboard after each move
 def draw_game_board(game_board):
     for col in range(COLUMN):
@@ -264,12 +218,8 @@ def draw_game_board(game_board):
                 pygame.draw.circle(screen, PLAYER_TWO, (int(col*SQUARE_SIZE+SQUARE_SIZE/2), screen_height - int(row*SQUARE_SIZE+SQUARE_SIZE/2)), TOKEN_RADIUS)
     pygame.display.update()
 
-#prints the game board in the terminal
-def print_board(game_board):
-    print(np.flip(game_board,0))
 
-
-game_board = create_gameboard()
+game_board = gm.create_gameboard()
 print(game_board)
 game_over = False
 turn = 0
@@ -322,10 +272,10 @@ while not game_over:
             #Player 1's game
             if turn == 0:
                 if IS_FIRST_MOVE:
-                    print(100000)
+                    #print(100000)
                     possible_token_slot_sets = gm.check_winning_recursive(game_board, 1, True)
                     IS_FIRST_MOVE = False
-                    drop_token(game_board, possible_token_slot_sets[0], possible_token_slot_sets[1], 1)
+                    gm.drop_token(game_board, possible_token_slot_sets[0], possible_token_slot_sets[1], 1)
                 else:
                     possible_token_slot_sets = gm.check_winning_recursive(game_board, 1)
                     print(possible_token_slot_sets)
@@ -357,7 +307,7 @@ while not game_over:
 
                     print("Best Possible Move is:")
                     print(best_possible_move)
-                    drop_token(game_board, best_possible_move[0], best_possible_move[1], 1)
+                    gm.drop_token(game_board, best_possible_move[0], best_possible_move[1], 1)
                     print(possible_token_slot_sets)
                     print(possible_token_slot_locations)
                     """print('Trees generated for all possible moves:')
@@ -373,29 +323,29 @@ while not game_over:
                 """
                 #print(type(possible_token_slot_sets))
                 
-                if is_winning_move(game_board, 1):
-                    display_label = display_font.render("Player 1 Wins!", 1, PLAYER_ONE)
+                if gm.is_winning_move(game_board, 1):
+                    display_label = display_font.render("AI Wins!", 1, PLAYER_ONE)
                     screen.blit(display_label, (70,10))
-                    print("Player 1 Wins!")
+                    print("AI Wins!")
                     game_over = True
 
             #Player 2's game
             else:
                 cursor_posx = event.pos[0]
                 col_choice =  int(math.floor(cursor_posx/SQUARE_SIZE))  #int(input("Player 2's Turn to choose the column(0-6) to insert the token"))
-                if check_isValid_Location(game_board, col_choice):
-                    open_row = get_next_open_row(game_board, col_choice)
-                    drop_token(game_board, open_row, col_choice, 2)
+                if gm.check_isValid_Location(game_board, col_choice):
+                    open_row = gm.get_next_open_row(game_board, col_choice)
+                    gm.drop_token(game_board, open_row, col_choice, 2)
 
-                    if is_winning_move(game_board, 2):
+                    if gm.is_winning_move(game_board, 2):
                         display_label = display_font.render("Player 2 Wins!", 1, PLAYER_TWO)
                         screen.blit(display_label, (70,10))
-                        print("Player 2 Wins!")
+                        print("Player Wins!")
                         game_over = True
                         #break
 
             #draw the game board after each players turn with the updated UI
-            print_board(game_board)
+            gm.print_board(game_board)
             draw_game_board(game_board)
 
             #calculation for indicating the player turn
