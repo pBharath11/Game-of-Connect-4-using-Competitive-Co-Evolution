@@ -19,6 +19,11 @@ BAD_MOVE = -999
 GOOD_MOVE = 25
 GREAT_MOVE = 999
 
+IS_FIRST_MOVE = True
+INITIAL_COL_CHOICE =  random.randint(0,6)
+turn = 0
+best_possible_moves_for_game = []
+
 #Define colors in RGB
 BOARD_BACKGROUND = (222,225,230)
 TOKEN_BACKGROUND = (14,15,16)
@@ -222,25 +227,23 @@ def draw_game_board(game_board):
 game_board = gm.create_gameboard()
 print(game_board)
 game_over = False
-turn = 0
-best_possible_moves_for_game = []
 
 #GUI initialisation
 pygame.init()
 
+#declaring screen width and height
 screen_width = COLUMN * SQUARE_SIZE
 screen_height = (ROW+1) * SQUARE_SIZE
 
 screen_size = (screen_width, screen_height)
 
+#setting the display mode and drawing the game board as GUI
 screen = pygame.display.set_mode(screen_size)
 draw_game_board(game_board)
 pygame.display.update()
 
 #font initialisation for rendering the text
 display_font = pygame.font.SysFont("Verdana", 75)
-IS_FIRST_MOVE = True
-INITIAL_COL_CHOICE =  random.randint(0,6)
 
 
 #game loop until the game is not over
