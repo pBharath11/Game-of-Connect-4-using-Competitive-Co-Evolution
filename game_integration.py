@@ -13,11 +13,12 @@ COLUMN = 7
 SQUARE_SIZE = 100
 TOKEN_RADIUS = int(SQUARE_SIZE/2 - 5)
 MUTATION_RATE = 0.2
-GENERATIONS = 5
+GENERATIONS = 3
 ORIENTATION_LIST = ['HORIZONTAL', 'VERTICAL', 'DIAGONAL', 'INV_DIAGONAL']
-BAD_MOVE = -999
+BAD_MOVE = -200
 GOOD_MOVE = 25
-GREAT_MOVE = 999
+GREAT_MOVE = 100
+MOVE_COUNTER = 0
 
 IS_FIRST_MOVE = True
 INITIAL_COL_CHOICE =  random.randint(0,6)
@@ -113,8 +114,11 @@ class TreeNode:
         #print(self.node_val)
         return self.node_val
     
+    def fetch_offset(self):
+        return self.offset_val
+    
     def fetch_move_row_col_value(self):
-        return self.possible_row_move, self.possible_col_move
+        return self.possible_row_move, self.possible_col_move, self.token
     
     def mutate(self):
         mutated_self = copy.deepcopy(self)
@@ -144,18 +148,27 @@ def find_best_move_after_evolution(population1, population2):
     sorted_pop2 = sorted(population2, key= lambda x:x.fetch_node_value(), reverse=True)
     pop1_best_move_node_val = sorted_pop1[0].fetch_node_value()
     pop2_best_move_node_val = sorted_pop2[0].fetch_node_value()
-    if pop1_best_move_node_val > pop2_best_move_node_val:
+    pop1_best_move_offset = sorted_pop1[0].fetch_offset()
+    pop2_best_move_offset = sorted_pop2[0].fetch_offset()
+    if pop1_best_move_offset >= pop2_best_move_offset:
         best_move = sorted_pop1[0].fetch_move_row_col_value()
-    else:
+    elif pop1_best_move_offset < pop2_best_move_offset:
         best_move = sorted_pop2[0].fetch_move_row_col_value()
+    else:
+        if pop1_best_move_node_val > pop2_best_move_node_val:
+            best_move = sorted_pop1[0].fetch_move_row_col_value()
+        else:
+            best_move = sorted_pop2[0].fetch_move_row_col_value()
     return best_move
 
-def co_evolve(tree_set):
+def co_evolve(tree_set, tree_set_human):
     population1 = copy.deepcopy(tree_set)
-    population2 = copy.deepcopy(tree_set)
+    population2 = copy.deepcopy(tree_set_human)
     mutated_population1 = []
     mutated_population2 = []
-    population_size = len(tree_set)
+    population1_size = len(tree_set)
+    population2_size = len(tree_set_human)
+    win_count = 0
 
     for gen in range(GENERATIONS):
         print("Generation " + str(gen+1) + "/" + str(GENERATIONS))
@@ -163,10 +176,10 @@ def co_evolve(tree_set):
         print(population1)
         print("Population 2:")
         print(population2)
-        for i in range(population_size):
+        for i in range(population1_size):
             population1[i].PrintTree()
             population1[i].decide_node_values()
-            for j in range(population_size):
+            for j in range(population2_size):
                 population2[j].PrintTree()
                 population2[j].decide_node_values()
                 if population1[i].node_val >= population2[j].node_val:
@@ -174,39 +187,49 @@ def co_evolve(tree_set):
                 else:
                     population2[j].add_win()
         print("Population 1 Node Values before sorting:")
-        for i in range(population_size):
+        for i in range(population1_size):
             population1[i].print_node_val()
         fitness_ranked_population1 = sorted(population1, key= lambda x:x.fetch_node_value(), reverse=True)
         print("Population 1 Node Values after sorting:")
-        for i in range(population_size):
+        for i in range(population1_size):
             fitness_ranked_population1[i].print_node_val()
         print("Population 2 Node Values before sorting:")
-        for i in range(population_size):
+        for i in range(population2_size):
             population2[i].print_node_val()
         fitness_ranked_population2 = sorted(population2, key= lambda x:x.fetch_node_value(), reverse=True)
         print("Population 2 Node Values after sorting:")
-        for i in range(population_size):
+        for i in range(population2_size):
             fitness_ranked_population2[i].print_node_val()
-
-        for length in range(int(population_size/2)):
+        for length in range(int(population1_size/2)):
             mutated_population1.append(fitness_ranked_population1[length])
+        for length in range(int(population2_size/2)):
             mutated_population2.append(fitness_ranked_population2[length])
         
         fitness_ranked_population1 = mutated_population1
+        population1 = mutated_population1
         fitness_ranked_population2 = mutated_population2
+        population2 = mutated_population2
         print(fitness_ranked_population1)
         print(fitness_ranked_population2)
-        for i in range(len(fitness_ranked_population1)):
-            print("Inside Mutation loop")
-            mutated_population1.append(fitness_ranked_population1[i].mutate())
-            mutated_population2.append(fitness_ranked_population2[i].mutate())
+        if gen+1 < GENERATIONS:
+            for i in range(len(fitness_ranked_population1)):
+                print("Inside Mutation loop  for Population 1")
+                mutated_population1.append(fitness_ranked_population1[i].mutate())
+            for i in range(len(fitness_ranked_population2)):
+                print("Inside Mutation loop for Population 2")
+                mutated_population2.append(fitness_ranked_population2[i].mutate())
 
-        population1 = mutated_population1
-        population2 = mutated_population2
-        population_size = len(population1)
+            population1 = mutated_population1
+            population2 = mutated_population2
+
+        population1_size = len(population1)
+        population2_size = len(population2)
+        sum_of_wins = find_best_move_after_evolution(population1,population2)
+        if sum_of_wins[2] == 1:
+            win_count += 1
 
     best_move_after_co_evolution  = find_best_move_after_evolution(population1,population2)
-    return best_move_after_co_evolution    
+    return best_move_after_co_evolution, win_count    
 
 #draws the GUI of the gameboard after each move
 def draw_game_board(game_board):
@@ -245,15 +268,20 @@ pygame.display.update()
 #font initialisation for rendering the text
 display_font = pygame.font.SysFont("Verdana", 75)
 
+win_count_list = []
 
 #game loop until the game is not over
 while not game_over:
     possible_token_slot_sets = []
+    possible_token_slot_sets_human = []
     possible_token_slot_locations = []
+    possible_token_slot_locations_human = []
     generated_tree_set = []
+    generated_tree_set_human = []
     node_value_set = []
     best_possible_move = None
     GLOBAL_CNTR = 0
+    
     #read every interaction in the system with the GUI
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -280,9 +308,13 @@ while not game_over:
                     IS_FIRST_MOVE = False
                     gm.drop_token(game_board, possible_token_slot_sets[0], possible_token_slot_sets[1], 1)
                 else:
+                    MOVE_COUNTER += 1
                     possible_token_slot_sets = gm.check_winning_recursive(game_board, 1)
                     print(possible_token_slot_sets)
+                    possible_token_slot_sets_human = gm.check_winning_recursive(game_board, 2)
+                    print(possible_token_slot_sets_human)
                     possible_token_slot_sets_len = len(possible_token_slot_sets)
+                    possible_token_slot_sets_human_len = len(possible_token_slot_sets_human)
                     for i in range(possible_token_slot_sets_len):
                         #print('Sending below list to find empty slot')
                         #print(possible_token_slot_set)
@@ -290,9 +322,6 @@ while not game_over:
                         possible_token_location_row,possible_token_location_col = gm.find_empty_slot(game_board, possible_token_slot_sets[i])
                         if (possible_token_location_row is None) and (possible_token_location_col is None):
                             possible_token_slot_sets.remove(i)
-                            print("(None,None) has occoured")
-                            print("(None,None) has occoured")
-                            print("(None,None) has occoured")
                             print("(None,None) has occoured")
                         else:
                             possible_token_location_var = possible_token_location_row, possible_token_location_col
@@ -305,7 +334,30 @@ while not game_over:
                             #print("counter value:" + str(GLOBAL_CNTR))
                             #GLOBAL_CNTR += 1
                             generated_tree_set[i].decide_node_values()
-                    best_possible_move = co_evolve(generated_tree_set)
+
+
+                    #generating possible move sets, possible token slot locations and tree objects for player 2 moves
+                    for i in range(possible_token_slot_sets_human_len):
+                        #print('Sending below list to find empty slot')
+                        #print(possible_token_slot_set)
+                        #print(len(possible_token_slot_set))
+                        possible_token_location_row,possible_token_location_col = gm.find_empty_slot(game_board, possible_token_slot_sets_human[i])
+                        if (possible_token_location_row is None) and (possible_token_location_col is None):
+                            possible_token_slot_sets_human.remove(i)
+                            print("(None,None) has occoured")
+                        else:
+                            possible_token_location_var = possible_token_location_row, possible_token_location_col
+                            possible_token_slot_locations_human.append(possible_token_location_var)
+                            print('empty slot locations:')
+                            print(possible_token_slot_locations_human)
+                            print("for")
+                            print(possible_token_slot_sets_human[i])
+                            generated_tree_set_human.append(TreeNode(game_board, 2, possible_token_slot_sets_human[i],possible_token_slot_locations_human[i] ))
+                            #print("counter value:" + str(GLOBAL_CNTR))
+                            #GLOBAL_CNTR += 1
+                            generated_tree_set_human[i].decide_node_values()
+                    best_possible_move, win_count_num = co_evolve(generated_tree_set, generated_tree_set_human)
+                    win_count_list.append(win_count_num)
                     best_possible_moves_for_game.append(best_possible_move)
 
                     print("Best Possible Move is:")
@@ -313,6 +365,8 @@ while not game_over:
                     gm.drop_token(game_board, best_possible_move[0], best_possible_move[1], 1)
                     print(possible_token_slot_sets)
                     print(possible_token_slot_locations)
+                    print(possible_token_slot_sets_human)
+                    print(possible_token_slot_locations_human)
                     """print('Trees generated for all possible moves:')
                     for cntr in range(len(generated_tree_set)):
                         generated_tree_set[cntr].PrintTree()
@@ -341,7 +395,7 @@ while not game_over:
                     gm.drop_token(game_board, open_row, col_choice, 2)
 
                     if gm.is_winning_move(game_board, 2):
-                        display_label = display_font.render("Player 2 Wins!", 1, PLAYER_TWO)
+                        display_label = display_font.render("Human Wins!", 1, PLAYER_TWO)
                         screen.blit(display_label, (70,10))
                         print("Player Wins!")
                         game_over = True
@@ -359,4 +413,5 @@ while not game_over:
             if game_over:
                 print('Best possible Moves generated over the course of the game:')
                 print(best_possible_moves_for_game)
+                print(f"Win counts over the game: {win_count_list}")
                 pygame.time.wait(10000)

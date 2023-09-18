@@ -202,7 +202,7 @@ def find_empty_slot(game_board, possible_move_set):
 def check_winning_recursive(game_board, token, first_time = False):
     # TODO: Generate col_choice (response[1])
     response = []
-    if first_time:
+    if first_time and token == 1:
         discard_num = random.randint(0,6)
         while game_board[0][discard_num] == 2:
             discard_num = random.randint(0,6)
