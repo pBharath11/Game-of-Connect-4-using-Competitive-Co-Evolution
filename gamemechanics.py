@@ -1,9 +1,6 @@
 import numpy as np
-import pygame
 import sys
-import math
 import random
-import copy
 
 #global value declarations
 ROW = 6

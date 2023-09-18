@@ -2,7 +2,6 @@ import numpy as np
 import pygame
 import sys
 import math
-import tree_implement as ti
 import gamemechanics as gm
 import random
 import copy
@@ -13,11 +12,11 @@ COLUMN = 7
 SQUARE_SIZE = 100
 TOKEN_RADIUS = int(SQUARE_SIZE/2 - 5)
 MUTATION_RATE = 0.2
-GENERATIONS = 5
+GENERATIONS = 10
 ORIENTATION_LIST = ['HORIZONTAL', 'VERTICAL', 'DIAGONAL', 'INV_DIAGONAL']
 BAD_MOVE = -999
 GOOD_MOVE = 30
-GREAT_MOVE = 100
+GREAT_MOVE = 300
 MOVE_COUNTER = 0
 
 IS_FIRST_MOVE = True
@@ -81,7 +80,7 @@ class TreeNode:
                 self.node_val = 50
             elif (self.offset_val - 1) == 4:
                 self.node_val = 90
-            print("Decision is None")
+            #print("Decision is None")
         else:
             #checks if the move is the best move or not and returns a boolean
             decision = gm.find_if_best_move(self.board_status, self.token, self.row_move_start_point, self.col_move_start_point, self.offset_val, self.orientation, self.possible_row_move, self.possible_col_move)
@@ -141,7 +140,7 @@ class TreeNode:
         col_start_point_for_mutation = None
         is_valid_result = False
         mutation_probability = random.random() #generates a mutation probability in random
-        print("Mutation probability:" + str(mutation_probability))
+        #print("Mutation probability:" + str(mutation_probability))
         while is_valid_result is False: #generates a set of values for row, column, orientation and checks if its a valid move or not
             orientation_for_mutation = random.choice(ORIENTATION_LIST)
             row_start_point_for_mutation = random.randint(0,(ROW-1))
